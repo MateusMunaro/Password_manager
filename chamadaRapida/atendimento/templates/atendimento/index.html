@@ -1,141 +1,1097 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gerenciamento de Senhas</title>
+    <title>Sistema de Gerenciamento de Senhas - Nova Era</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'atendimento/css/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --danger-gradient: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: backgroundMove 20s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(120deg); }
+            66% { transform: translate(20px, -20px) rotate(240deg); }
+        }
+
+        /* Header */
+        .main-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(to right, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+            to { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6); }
+        }
+
+        /* Digital Display Panel */
+        .digital-display {
+            background: #000;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 
+                0 0 50px rgba(0, 255, 255, 0.5),
+                inset 0 0 20px rgba(0, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .digital-display::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff);
+            border-radius: 20px;
+            opacity: 0.7;
+            z-index: -1;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .current-call {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .current-call h2 {
+            font-size: 1.5rem;
+            color: #00ffff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .senha-display {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #00ffff;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .posto-display {
+            font-size: 2rem;
+            color: #ff00ff;
+            margin-top: 20px;
+            text-shadow: 
+                0 0 10px #ff00ff,
+                0 0 20px #ff00ff;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        /* Status Cards */
+        .status-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .status-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .status-card h4 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-value {
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Queue Display */
+        .queue-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .senha-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin: 10px 0;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .senha-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .senha-item:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .senha-item:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .senha-normal {
+            background: var(--info-gradient);
+            color: #fff;
+        }
+
+        .senha-prioritaria {
+            background: var(--danger-gradient);
+            color: #fff;
+            animation: priorityPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes priorityPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(252, 74, 26, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(252, 74, 26, 0.8); }
+        }
+
+        /* Postos */
+        .posto-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .posto-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(255, 255, 255, 0.1), transparent 30%);
+            animation: rotate 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .posto-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .posto-numero {
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .posto-status {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 0;
+        }
+
+        .status-livre {
+            background: var(--success-gradient);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.5);
+        }
+
+        .status-ocupado {
+            background: var(--danger-gradient);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(252, 74, 26, 0.5);
+            animation: ocupadoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes ocupadoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .status-inativo {
+            background: var(--dark-gradient);
+            color: #999;
+            opacity: 0.6;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--glass-border);
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-custom:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: #fff;
+        }
+
+        .btn-primary-custom {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-success-custom {
+            background: var(--success-gradient);
+            border: none;
+        }
+
+        .btn-danger-custom {
+            background: var(--danger-gradient);
+            border: none;
+        }
+
+        .btn-info-custom {
+            background: var(--info-gradient);
+            border: none;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 80px;
+            height: 40px;
+            margin: 0 15px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
+            transition: 0.4s;
+            border-radius: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 5px;
+            bottom: 5px;
+            background: white;
+            transition: 0.4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        input:checked + .toggle-slider {
+            background: var(--success-gradient);
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(17, 153, 142, 0.5);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(40px);
+        }
+
+        /* Alert */
+        .alert-floating {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 350px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            color: #fff;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Results */
+        .results-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .posto-card {
+                margin: 10px 0;
+            }
+            
+            .senha-display {
+                font-size: 3rem;
+            }
+            
+            .btn-custom {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 20px;
+        }
+
+        .loading-dots div {
+            position: absolute;
+            top: 0;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: #fff;
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+
+        .loading-dots div:nth-child(1) {
+            left: 8px;
+            animation: lds-ellipsis1 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(2) {
+            left: 8px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(3) {
+            left: 32px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(4) {
+            left: 56px;
+            animation: lds-ellipsis3 0.6s infinite;
+        }
+
+        @keyframes lds-ellipsis1 {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes lds-ellipsis3 {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+
+        @keyframes lds-ellipsis2 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(24px, 0); }
+        }
+    </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <header class="bg-primary text-white py-3 mb-4">
-            <div class="container">
-                <h1 class="text-center"><i class="fas fa-ticket-alt me-2"></i>Sistema de Gerenciamento de Senhas</h1>
-            </div>
-        </header>
-
+    <header class="main-header">
         <div class="container">
-            <!-- Painel de Status -->
-            <div class="row dashboard mb-4">
-                <div class="col-md-4">
-                    <div class="status-card">
-                        <h4><i class="fas fa-users me-2"></i>Status da Fila</h4>
-                        <div class="d-flex justify-content-between">
-                            <p>Total na fila:</p>
-                            <p><span id="total-fila" class="badge bg-primary">0</span></p>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <p>Senhas atendidas:</p>
-                            <p><span id="total-atendidas" class="badge bg-success">0</span></p>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <p>Desistências:</p>
-                            <p><span id="total-desistencias" class="badge bg-danger">0</span></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="status-card">
-                        <h4><i class="fas fa-clipboard-list me-2"></i>Próximas Senhas</h4>
-                        <div id="proximas-senhas">
-                            <p>Nenhuma senha na fila</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="status-card">
-                        <h4><i class="fas fa-desktop me-2"></i>Próximo Atendimento</h4>
-                        <p>Próximo posto disponível: <span id="proximo-posto" class="badge bg-info">-</span></p>
-                    </div>
+            <h1><i class="fas fa-ticket-alt me-3"></i>Sistema de Gerenciamento de Senhas</h1>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <!-- Digital Display Panel -->
+        <div class="digital-display">
+            <div class="current-call">
+                <h2>Chamando Agora</h2>
+                <div class="senha-display" id="current-senha">---</div>
+                <div class="posto-display" id="current-posto">Aguardando...</div>
+            </div>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="status-card">
+                    <h4><i class="fas fa-users fa-2x"></i> Total na Fila</h4>
+                    <div class="status-value" id="total-fila">0</div>
                 </div>
             </div>
-            
-            <!-- Postos de Atendimento -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h3><i class="fas fa-building me-2"></i>Postos de Atendimento</h3>
-                    <div id="postos" class="d-flex flex-wrap">
-                        <!-- Os postos serão adicionados via JavaScript -->
-                    </div>
+            <div class="col-md-4 mb-3">
+                <div class="status-card">
+                    <h4><i class="fas fa-check-circle fa-2x"></i> Atendidas</h4>
+                    <div class="status-value" id="total-atendidas">0</div>
                 </div>
             </div>
-            
-            <!-- Controles -->
-            <div class="row controles mb-4">
-                <div class="col-md-12 d-flex justify-content-between">
-                    <div>
-                        <button id="btn-gerar-normal" class="btn btn-primary">
-                            <i class="fas fa-plus-circle me-1"></i> Gerar Senha Normal
-                        </button>
-                        <button id="btn-gerar-prioritaria" class="btn btn-warning ms-2">
-                            <i class="fas fa-plus-circle me-1"></i> Gerar Senha Prioritária
-                        </button>
-                    </div>
-                    <div>
-                        <button id="btn-chamar-proxima" class="btn btn-success">
-                            <i class="fas fa-bullhorn me-1"></i> Chamar Próxima Senha
-                        </button>
-                        <button id="btn-simular-desistencia" class="btn btn-danger ms-2">
-                            <i class="fas fa-user-times me-1"></i> Simular Desistência
-                        </button>
-                    </div>
-                    <div>
-                        <button id="btn-encerrar" class="btn btn-dark">
-                            <i class="fas fa-power-off me-1"></i> Encerrar Simulação
-                        </button>
-                    </div>
+            <div class="col-md-4 mb-3">
+                <div class="status-card">
+                    <h4><i class="fas fa-user-times fa-2x"></i> Desistências</h4>
+                    <div class="status-value" id="total-desistencias">0</div>
                 </div>
             </div>
-            
-            <!-- Modo Automático -->
-            <div class="row mb-4">
-                <div class="col-12 text-center">
-                    <div class="form-check form-switch d-inline-block">
-                        <input class="form-check-input" type="checkbox" id="modo-automatico">
-                        <label class="form-check-label" for="modo-automatico">
-                            Modo Automático <i class="fas fa-robot ms-1"></i>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Resultados -->
-            <div id="resultados" class="mt-4" style="display: none;">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="m-0"><i class="fas fa-chart-bar me-2"></i>Resultados da Simulação</h3>
-                    </div>
-                    <div class="card-body">
-                        <div>
-                            <h4><i class="fas fa-list-ol me-2"></i>Senhas Atendidas (da última para a primeira):</h4>
-                            <div id="lista-senhas-atendidas" class="mt-2"></div>
-                        </div>
-                        <div class="mt-3 row">
-                            <div class="col-md-6">
-                                <div class="alert alert-success">
-                                    <h5>Total de senhas atendidas: <span id="resultado-total-atendidas">0</span></h5>
-                                </div>
+        </div>
+
+        <!-- Queue Display -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="queue-container">
+                    <h3 class="mb-4"><i class="fas fa-list-ol me-2"></i>Próximas Senhas</h3>
+                    <div id="proximas-senhas">
+                        <div class="text-center p-5">
+                            <div class="loading-dots">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="alert alert-danger">
-                                    <h5>Total de desistências: <span id="resultado-total-desistencias">0</span></h5>
-                                </div>
-                            </div>
+                            <p class="mt-3">Aguardando senhas...</p>
                         </div>
-                        <button id="btn-nova-simulacao" class="btn btn-primary mt-3">
-                            <i class="fas fa-redo me-1"></i> Nova Simulação
-                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Postos -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3 class="mb-4"><i class="fas fa-building me-2"></i>Postos de Atendimento</h3>
+                <div class="row" id="postos">
+                    <!-- Postos serão adicionados dinamicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-3">
+                <button id="btn-gerar-normal" class="btn-custom btn-primary-custom w-100">
+                    <i class="fas fa-plus-circle me-2"></i>Senha Normal
+                </button>
+            </div>
+            <div class="col-md-4 mb-3">
+                <button id="btn-gerar-prioritaria" class="btn-custom btn-danger-custom w-100">
+                    <i class="fas fa-star me-2"></i>Senha Prioritária
+                </button>
+            </div>
+            <div class="col-md-4 mb-3">
+                <button id="btn-chamar-proxima" class="btn-custom btn-success-custom w-100">
+                    <i class="fas fa-bullhorn me-2"></i>Chamar Próxima
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <button id="btn-simular-desistencia" class="btn-custom btn-info-custom w-100">
+                    <i class="fas fa-user-times me-2"></i>Simular Desistência
+                </button>
+            </div>
+            <div class="col-md-6 mb-3">
+                <button id="btn-encerrar" class="btn-custom w-100">
+                    <i class="fas fa-power-off me-2"></i>Encerrar Simulação
+                </button>
+            </div>
+        </div>
+
+        <!-- Automatic Mode -->
+        <div class="toggle-container">
+            <span style="font-size: 1.2rem;">Modo Manual</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="modo-automatico">
+                <span class="toggle-slider"></span>
+            </label>
+            <span style="font-size: 1.2rem;">Modo Automático <i class="fas fa-robot"></i></span>
+        </div>
+
+        <!-- Results -->
+        <div id="resultados" class="results-container" style="display: none;">
+            <h3 class="mb-4"><i class="fas fa-chart-bar me-2"></i>Resultados da Simulação</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="status-card">
+                        <h4>Total Atendidas</h4>
+                        <div class="status-value" id="resultado-total-atendidas">0</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="status-card">
+                        <h4>Total Desistências</h4>
+                        <div class="status-value" id="resultado-total-desistencias">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <h4>Senhas Atendidas:</h4>
+                <div id="lista-senhas-atendidas" class="mt-3"></div>
+            </div>
+            <button id="btn-nova-simulacao" class="btn-custom btn-primary-custom mt-4">
+                <i class="fas fa-redo me-2"></i>Nova Simulação
+            </button>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'atendimento/js/simulation.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            // Variables
+            let intervalId = null;
+            let modoAutomatico = false;
+            let simulacaoEmAndamento = true;
+            let currentCall = { senha: '---', posto: 'Aguardando...' };
+            
+            // Sound effects (optional - you can add audio files)
+            function playSound(type) {
+                // Implement sound playing if desired
+            }
+            
+            // Update status with animations
+            function atualizarStatus() {
+                $.get('/api/status/', function(response) {
+                    if (response.status === 'success') {
+                        // Animate number changes
+                        animateValue('total-fila', parseInt($('#total-fila').text()), response.total_aguardando);
+                        animateValue('total-atendidas', parseInt($('#total-atendidas').text()), response.simulacao.senhas_atendidas);
+                        animateValue('total-desistencias', parseInt($('#total-desistencias').text()), response.simulacao.desistencias);
+                        
+                        // Update queue with fade effect
+                        $('#proximas-senhas').fadeOut(200, function() {
+                            $(this).empty();
+                            if (response.proximas_senhas.length > 0) {
+                                response.proximas_senhas.forEach(function(senha, index) {
+                                    const senhaClass = senha.tipo === 'N' ? 'senha-normal' : 'senha-prioritaria';
+                                    const senhaHtml = `<div class="senha-item ${senhaClass}" style="animation-delay: ${index * 0.1}s">
+                                        ${senha.tipo}${senha.numero}
+                                        ${index === 0 ? '<i class="fas fa-arrow-right ms-2"></i>' : ''}
+                                    </div>`;
+                                    $('#proximas-senhas').append(senhaHtml);
+                                });
+                            } else {
+                                $('#proximas-senhas').html('<p class="text-center">Nenhuma senha na fila</p>');
+                            }
+                            $(this).fadeIn(200);
+                        });
+                        
+                        // Update postos with smooth transitions
+                        updatePostos(response.postos);
+                    }
+                });
+            }
+            
+            // Animate number changes
+            function animateValue(id, start, end) {
+                const duration = 500;
+                const range = end - start;
+                const increment = range / (duration / 16);
+                let current = start;
+                
+                const timer = setInterval(function() {
+                    current += increment;
+                    if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                        current = end;
+                        clearInterval(timer);
+                    }
+                    $('#' + id).text(Math.round(current));
+                }, 16);
+            }
+            
+            // Update postos display
+            function updatePostos(postos) {
+                const container = $('#postos');
+                
+                postos.forEach(function(posto) {
+                    let postoCard = $(`#posto-${posto.id}`);
+                    
+                    if (postoCard.length === 0) {
+                        // Create new posto card
+                        const postoHtml = createPostoHtml(posto);
+                        container.append(postoHtml);
+                        postoCard = $(`#posto-${posto.id}`);
+                        postoCard.hide().fadeIn(500);
+                    } else {
+                        // Update existing posto
+                        updatePostoCard(postoCard, posto);
+                    }
+                });
+            }
+            
+            function createPostoHtml(posto) {
+                const statusClass = getStatusClass(posto);
+                const statusText = getStatusText(posto);
+                const buttons = getPostoButtons(posto);
+                
+                return `
+                    <div class="col-md-3 col-sm-6 mb-3" id="posto-${posto.id}">
+                        <div class="posto-card ${posto.ativo ? '' : 'opacity-50'}">
+                            <div class="posto-numero">${posto.numero}</div>
+                            <div class="posto-status ${statusClass}">${statusText}</div>
+                            <div class="mt-3">${buttons}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function updatePostoCard(card, posto) {
+                const statusClass = getStatusClass(posto);
+                const statusText = getStatusText(posto);
+                const buttons = getPostoButtons(posto);
+                
+                card.find('.posto-status')
+                    .removeClass('status-livre status-ocupado status-inativo')
+                    .addClass(statusClass)
+                    .text(statusText);
+                
+                card.find('.posto-card').toggleClass('opacity-50', !posto.ativo);
+                card.find('.mt-3').html(buttons);
+                
+                // Add animation effect
+                card.find('.posto-card').addClass('animate__animated animate__pulse');
+                setTimeout(() => card.find('.posto-card').removeClass('animate__animated animate__pulse'), 1000);
+            }
+            
+            function getStatusClass(posto) {
+                if (!posto.ativo) return 'status-inativo';
+                return posto.ocupado ? 'status-ocupado' : 'status-livre';
+            }
+            
+            function getStatusText(posto) {
+                if (!posto.ativo) return 'Inativo';
+                return posto.ocupado ? `Senha ${posto.senha_atual}` : 'Livre';
+            }
+            
+            function getPostoButtons(posto) {
+                let buttons = '';
+                
+                if (posto.numero > 3) {
+                    const btnClass = posto.ativo ? 'btn-danger-custom' : 'btn-success-custom';
+                    const btnText = posto.ativo ? 'Desativar' : 'Ativar';
+                    const btnIcon = posto.ativo ? 'fa-toggle-off' : 'fa-toggle-on';
+                    buttons += `<button class="btn-custom ${btnClass} btn-sm btn-alternar" data-posto-id="${posto.id}">
+                        <i class="fas ${btnIcon}"></i> ${btnText}
+                    </button>`;
+                }
+                
+                if (posto.ocupado) {
+                    buttons += `<button class="btn-custom btn-primary-custom btn-sm btn-finalizar ms-2" data-posto-id="${posto.id}">
+                        <i class="fas fa-check"></i> Finalizar
+                    </button>`;
+                }
+                
+                return buttons;
+            }
+            
+            // Show alert with custom styling
+            function exibirAlerta(mensagem, tipo) {
+                $('.alert-floating').remove();
+                
+                const alertClass = {
+                    'success': 'alert-success',
+                    'danger': 'alert-danger',
+                    'warning': 'alert-warning',
+                    'info': 'alert-info'
+                };
+                
+                const alerta = `
+                    <div class="alert ${alertClass[tipo]} alert-floating alert-dismissible fade show" role="alert">
+                        ${mensagem}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                $('body').append(alerta);
+                
+                setTimeout(function() {
+                    $('.alert-floating').fadeOut(500, function() {
+                        $(this).remove();
+                    });
+                }, 3000);
+            }
+            
+            // Update current call display
+            function updateCurrentCall(senha, posto) {
+                $('#current-senha').fadeOut(200, function() {
+                    $(this).text(senha).fadeIn(200);
+                });
+                $('#current-posto').fadeOut(200, function() {
+                    $(this).text(`Posto ${posto}`).fadeIn(200);
+                });
+                
+                // Add pulsing effect
+                $('.current-call').addClass('animate__animated animate__pulse');
+                setTimeout(() => $('.current-call').removeClass('animate__animated animate__pulse'), 1000);
+            }
+            
+            // Event handlers
+            $('#btn-gerar-normal').click(function() {
+                const btn = $(this);
+                btn.prop('disabled', true);
+                
+                $.post('/api/gerar-senha/', { tipo: 'N' }, function(response) {
+                    if (response.status === 'success') {
+                        exibirAlerta(`Senha ${response.senha} gerada!`, 'success');
+                        atualizarStatus();
+                    }
+                }).always(() => btn.prop('disabled', false));
+            });
+            
+            $('#btn-gerar-prioritaria').click(function() {
+                const btn = $(this);
+                btn.prop('disabled', true);
+                
+                $.post('/api/gerar-senha/', { tipo: 'P' }, function(response) {
+                    if (response.status === 'success') {
+                        exibirAlerta(`Senha Prioritária ${response.senha} gerada!`, 'success');
+                        atualizarStatus();
+                    }
+                }).always(() => btn.prop('disabled', false));
+            });
+            
+            $('#btn-chamar-proxima').click(function() {
+                const btn = $(this);
+                btn.prop('disabled', true);
+                
+                $.post('/api/chamar-proxima/', function(response) {
+                    if (response.status === 'success') {
+                        updateCurrentCall(response.senha, response.posto);
+                        exibirAlerta(`Chamando ${response.senha} no posto ${response.posto}`, 'info');
+                        atualizarStatus();
+                    } else {
+                        exibirAlerta(response.message, 'warning');
+                    }
+                }).always(() => btn.prop('disabled', false));
+            });
+            
+            $('#btn-simular-desistencia').click(function() {
+                $.post('/api/simular-desistencia/', function(response) {
+                    if (response.status === 'success') {
+                        exibirAlerta(`Senha ${response.senha} desistiu`, 'danger');
+                        atualizarStatus();
+                    } else {
+                        exibirAlerta(response.message, 'warning');
+                    }
+                });
+            });
+            
+            $(document).on('click', '.btn-finalizar', function() {
+                const postoId = $(this).data('posto-id');
+                const btn = $(this);
+                btn.prop('disabled', true);
+                
+                $.post('/api/finalizar-atendimento/', { posto_id: postoId }, function(response) {
+                    if (response.status === 'success') {
+                        exibirAlerta(`Atendimento finalizado no posto ${response.posto}`, 'success');
+                        atualizarStatus();
+                    }
+                }).always(() => btn.prop('disabled', false));
+            });
+            
+            $(document).on('click', '.btn-alternar', function() {
+                const postoId = $(this).data('posto-id');
+                $.post('/api/alternar-posto/', { posto_id: postoId }, function(response) {
+                    if (response.status === 'success') {
+                        const statusText = response.ativo ? 'ativado' : 'desativado';
+                        exibirAlerta(`Posto ${response.posto} ${statusText}`, 'info');
+                        atualizarStatus();
+                    }
+                });
+            });
+            
+            $('#btn-encerrar').click(function() {
+                if (!confirm('Deseja realmente encerrar a simulação?')) {
+                    return;
+                }
+                
+                $.post('/api/encerrar-simulacao/', function(response) {
+                    if (response.status === 'success') {
+                        clearInterval(intervalId);
+                        simulacaoEmAndamento = false;
+                        
+                        $('#modo-automatico').prop('checked', false);
+                        modoAutomatico = false;
+                        
+                        // Show results with animation
+                        $('.container > *:not(#resultados)').fadeOut(500, function() {
+                            $('#lista-senhas-atendidas').empty();
+                            if (response.senhas_atendidas.length > 0) {
+                                response.senhas_atendidas.forEach(function(senha, index) {
+                                    const senhaClass = senha.charAt(0) === 'N' ? 'senha-normal' : 'senha-prioritaria';
+                                    $('#lista-senhas-atendidas').append(
+                                        `<div class="senha-item ${senhaClass}" style="animation-delay: ${index * 0.05}s">${senha}</div> `
+                                    );
+                                });
+                            }
+                            
+                            $('#resultado-total-atendidas').text(response.total_atendidas);
+                            $('#resultado-total-desistencias').text(response.total_desistencias);
+                            
+                            $('#resultados').fadeIn(500);
+                        });
+                    }
+                });
+            });
+            
+            $('#btn-nova-simulacao').click(function() {
+                location.reload();
+            });
+            
+            // Automatic mode
+            $('#modo-automatico').change(function() {
+                modoAutomatico = $(this).is(':checked');
+                
+                if (modoAutomatico) {
+                    exibirAlerta('Modo automático ativado!', 'info');
+                    executarSimulacaoAutomatica();
+                } else {
+                    exibirAlerta('Modo automático desativado!', 'info');
+                }
+            });
+            
+            // Automatic simulation functions
+            function executarSimulacaoAutomatica() {
+                if (!modoAutomatico || !simulacaoEmAndamento) return;
+                
+                // Generate tickets
+                setInterval(function() {
+                    if (modoAutomatico && simulacaoEmAndamento) {
+                        const tipo = Math.random() > 0.7 ? 'P' : 'N';
+                        $.post('/api/gerar-senha/', { tipo: tipo });
+                    }
+                }, Math.random() * 3000 + 2000);
+                
+                // Call next
+                setInterval(function() {
+                    if (modoAutomatico && simulacaoEmAndamento) {
+                        $.post('/api/chamar-proxima/', function(response) {
+                            if (response.status === 'success') {
+                                updateCurrentCall(response.senha, response.posto);
+                            }
+                        });
+                    }
+                }, Math.random() * 3000 + 5000);
+                
+                // Simulate dropouts
+                setInterval(function() {
+                    if (modoAutomatico && simulacaoEmAndamento && Math.random() > 0.7) {
+                        $.post('/api/simular-desistencia/');
+                    }
+                }, Math.random() * 5000 + 10000);
+                
+                // Finalize services
+                setInterval(function() {
+                    if (modoAutomatico && simulacaoEmAndamento) {
+                        $('.btn-finalizar').each(function() {
+                            if (Math.random() > 0.5) {
+                                const postoId = $(this).data('posto-id');
+                                $.post('/api/finalizar-atendimento/', { posto_id: postoId });
+                            }
+                        });
+                    }
+                }, Math.random() * 3000 + 7000);
+            }
+            
+            // Initialize
+            atualizarStatus();
+            intervalId = setInterval(atualizarStatus, 2000);
+            
+            // Add entrance animation
+            $('.status-card, .posto-card, .queue-container').each(function(index) {
+                $(this).css('opacity', '0').delay(index * 100).animate({ opacity: 1 }, 500);
+            });
+        });
+    </script>
 </body>
 </html>
